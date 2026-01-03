@@ -1,49 +1,3 @@
-Abhilash R
-abhilashr_35104
-•
-chilling
-
-This is the start of the #backend channel. 
-Darshan S
- — 
-9:28 AM
-from flask_sqlalchemy import SQLAlchemy
-
-Initialize the database tool
-db = SQLAlchemy()
-
----------------------------------
-
-    THE TRIP BLUEPRINT
-
----------------------------------
-class Trip(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
-Requirements from PDF
-    name = db.Column(db.String(100), nullable=False)        # "Summer in Paris"
-    start_date = db.Column(db.Date, nullable=False)         # 2026-06-01
-    end_date = db.Column(db.Date, nullable=False)           # 2026-06-10
-
-We will link this to a User later (just use an integer for now)
-    user_id = db.Column(db.Integer, nullable=False)
-
-    def repr(self):
-        return f'<Trip {self.name}>'
-Darshan S
- — 
-10:02 AM
-⚠️ CRITICAL: You need to ask Abhi for 3 things:
-
-His Username: (Usually root in XAMPP/Workbench).
-
-His Password: (Whatever he set when installing MySQL. If none, leave it empty).
-
-The Database Name: (He must create a database named globetrotter inside MySQL first)
-Abhilash R
- — 
-10:14 AM
-
 from sqlalchemy import create_engine, Column, Integer, String, Text, DECIMAL, Date, DateTime, Enum, ForeignKey, TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -398,3 +352,4 @@ class AdminLog(Base):
     action = Column(String(255))
     user_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'))
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
+
