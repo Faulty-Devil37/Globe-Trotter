@@ -3,6 +3,7 @@ from sqlalchemy import func
 from models import User, Trip, TripStop, Activity,TripActivity,Budget,User
 from datetime import datetime   
 import auth
+import requests
 
 def register_user(db: Session, data: dict):
     existing_user = db.query(User).filter(User.email == data['email']).first()
@@ -118,6 +119,33 @@ def get_trip_breakdown(db: Session, trip_id: int):
         "total_cost": total_cost          
     }
 
+def get_city_image_wikipedia(city_name: str):
+    try:
+        
+        url = "https://en.wikipedia.org/w/api.php"
+        
+        params = {
+            "action": "query",
+            "format": "json",
+            "titles": city_name,
+            "prop": "pageimages",
+            "pithumbsize": 600  
+        }
+        
+        response = requests.get(url, params=params)
+        data = response.json()
+        
+        pages = data.get("query", {}).get("pages", {})
+        
+        for page_id, page_data in pages.items():
+            if "thumbnail" in page_data:
+                return page_data["thumbnail"]["source"]
+                
+    except Exception as e:
+        print(f"Error fetching image for {city_name}: {e}")
+
+    return "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&q=80"
+
 def get_popular_destinations(db: Session):
     results = db.query(
         TripStop.city, 
@@ -129,7 +157,8 @@ def get_popular_destinations(db: Session):
 
     popular_list = []
     for city, count in results:
-        image_url = f"https://loremflickr.com/800/600/{city},city,view/all"  
+        image_url = get_city_image_wikipedia(city)
+        
         popular_list.append({
             "city": city,
             "visitors": count,
