@@ -1,5 +1,10 @@
 export const Navbar = () => {
   const user = JSON.parse(localStorage.getItem('user'));
+  // Get current path to determine active state. Default to #/
+  const currentPath = window.location.hash || '#/';
+
+  // Helper to check active state
+  const isActive = (path) => currentPath === path ? 'active' : '';
 
   return `
     <nav>
@@ -13,12 +18,15 @@ export const Navbar = () => {
         </a>
 
         <!-- Navigation Links -->
-        <div class="nav-links flex items-center gap-4">
-          <a href="#/" class="nav-link">Dashboard</a>
-          <a href="#/create-trip" class="nav-link">Plan Trip</a>
-          <a href="#/itinerary-build" class="nav-link" style="color: var(--accent-color); font-weight: 600;">Itinerary Builder</a>
-          <a href="#/my-trips" class="nav-link">My Trips</a>
-          <a href="#/admin" class="nav-link">Admin</a>
+        <div class="nav-links flex items-center gap-2" style="margin-left: 3rem;">
+          <a href="#/" class="nav-link ${isActive('#/') || isActive('')}">Dashboard</a>
+          <a href="#/create-trip" class="nav-link ${isActive('#/create-trip')}">Plan Trip</a>
+          <a href="#/itinerary-build" class="nav-link ${isActive('#/itinerary-build')}">Builder</a>
+          <a href="#/itinerary-view" class="nav-link ${isActive('#/itinerary-view')}">Itinerary</a>
+          <a href="#/community" class="nav-link ${isActive('#/community')}">Community</a>
+          <a href="#/calendar" class="nav-link ${isActive('#/calendar')}">Calendar</a>
+          <a href="#/my-trips" class="nav-link ${isActive('#/my-trips')}">Trips</a>
+          <a href="#/profile" class="nav-link ${isActive('#/profile')}">Profile</a>
         </div>
 
         <!-- Auth Actions -->
