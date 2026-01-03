@@ -1,0 +1,17 @@
+# --- The "Do Not Enter" List ---
+
+# 1. Ignore the Virtual Environment (The Toolbox)
+venv/
+.venv/
+env/
+
+# 2. Ignore the Database (The Save File)
+*.db
+*.sqlite3
+
+# 3. Ignore Python Junk
+__pycache__/
+*.pyc
+
+# 4. Ignore System Junk
+.DS_Store
