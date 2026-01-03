@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from models import User, Trip, TripStop, Activity,TripActivity
+from models import User, Trip, TripStop, Activity,TripActivity,Budget
 from datetime import datetime   
 
 def create_trip(db: Session, data: dict) :
@@ -56,3 +56,30 @@ def add_new_activity(db: Session, data: dict):
     db.refresh(new_activity)
 
     return new_activity
+
+def add_manual_expense(db: Session, data: dict):
+    new_budget = Budget(
+        trip_id = data['trip_id'],
+        amount = float(data['amount']),
+        category = data['category'],
+    )
+
+    db.add(new_budget)
+    db.commit()
+    db.refresh(new_budget)
+
+    return new_budget
+
+def get_trip_breakdown(db: Session, trip_id: int):
+    manual_total = db.query(func.sum(Budget.amount)).filter(Budget.trip_id == trip_id).scalar() or 0.0
+
+    activity_total = db.query(func.sum(Activity.cost)).join(TripActivity).join(TripStop).filter(TripStop.trip_id == trip_id).scalar() or 0.0
+
+    total_cost = manual_total + activity_total
+
+    return {
+        "trip_id": trip_id,
+        "manual_expenses": manual_total,  
+        "activity_expenses": activity_total, 
+        "total_cost": total_cost          
+    }
