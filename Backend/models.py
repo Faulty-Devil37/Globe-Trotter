@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, Column, Integer, String, Text, DECIMAL, Date, DateTime, Enum, ForeignKey, TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
-from datetime import datetime
+from datetime import datetime, timezone
 
 Base = declarative_base()
 
@@ -13,7 +13,7 @@ class User(Base):
     email = Column(String(100), nullable=False, unique=True)
     password_hash = Column(String(200), nullable=False)
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
-
+    created_at = Column(TIMESTAMP, default=lambda: datetime.now(timezone.utc))
     trips = relationship("Trip", back_populates="user")
 
 
@@ -27,8 +27,7 @@ class Trip(Base):
     end_date = Column(Date)
     description = Column(Text)
     cover_photo = Column(String(255))
-    created_at = Column(TIMESTAMP, default=datetime.utcnow)
-
+    created_at = Column(TIMESTAMP, default=lambda: datetime.now(timezone.utc))
     user = relationship("User", back_populates="trips")
     stops = relationship("TripStop", back_populates="trip")
     budgets = relationship("Budget", back_populates="trip")
@@ -102,4 +101,4 @@ class AdminLog(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     action = Column(String(255))
     user_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'))
-    created_at = Column(TIMESTAMP, default=datetime.utcnow)
+    created_at = Column(TIMESTAMP, default=lambda: datetime.now(timezone.utc))
