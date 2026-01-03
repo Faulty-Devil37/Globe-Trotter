@@ -13,7 +13,6 @@ export const DashboardView = () => {
            <p style="color: var(--text-body); font-size: 0.9rem;">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
         </div>
 
-        <!-- Professional Hero Section (No 3D) -->
         <section class="hero-container mb-8">
            <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=1600&h=800&fit=crop" style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
            <div class="hero-overlay">
@@ -31,7 +30,6 @@ export const DashboardView = () => {
            </div>
         </section>
 
-        <!-- Search Bar & Controls -->
         <div class="flex gap-4 mb-8 items-center card" style="padding: 1rem;">
            <div class="flex items-center gap-2 flex-1 px-4">
              <i data-lucide="search" style="color: var(--text-body);"></i>
@@ -43,27 +41,18 @@ export const DashboardView = () => {
            </div>
         </div>
 
-        <!-- Top Destinations -->
         <section>
           <div class="flex items-center justify-between mb-6">
-             <h3>Global Trending</h3>
-             <a href="#/search-city" class="flex items-center gap-2" style="color: var(--primary-color); font-weight: 600; font-size: 0.95rem;">View All <i data-lucide="arrow-right" style="width: 16px;"></i></a>
+              <h3>Global Trending</h3>
+              <a href="#/search-city" class="flex items-center gap-2" style="color: var(--primary-color); font-weight: 600; font-size: 0.95rem;">View All <i data-lucide="arrow-right" style="width: 16px;"></i></a>
           </div>
-          <div class="grid grid-5">
-            ${[1, 2, 3, 4, 5].map(i => `
-              <div class="card clickable text-center justify-center pointer" style="aspect-ratio: 1; padding: 1.5rem;">
-                <div style="width: 56px; height: 56px; background: #F1F5F9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; color: var(--primary-color);">
-                   <i data-lucide="map-pin"></i>
-                </div>
-                <h4 style="margin: 0; font-size: 1rem;">Region ${i}</h4>
-                <p style="font-size: 0.85rem; color: var(--text-body); margin-top: 0.25rem;">24 Itineraries</p>
-              </div>
-            `).join('')}
+          
+          <div id="popular-destinations-container" class="grid grid-5">
+              <p style="grid-column: span 5; text-align: center; color: var(--text-body);">Loading global adventures...</p>
           </div>
         </section>
 
-        <!-- Previous Trips -->
-        <section style="margin-top: 1rem;">
+        <section style="margin-top: 3rem;">
            <h3 class="mb-6">Journey History</h3>
            <div class="grid grid-3">
             ${[1, 2, 3].map(i => `
@@ -86,12 +75,34 @@ export const DashboardView = () => {
             `).join('')}
            </div>
         </section>
-
       </div>
     </main>
   `;
 };
 
-export const initDashboard = () => {
-  // No more 3D logic
+export const initDashboard = async () => {
+  const container = document.querySelector('#popular-destinations-container');
+  if (!container) return;
+
+  try {
+    // Calling the FastAPI Backend
+    const response = await fetch('http://127.0.0.1:8000/popular-destinations/');
+    const destinations = await response.json();
+
+    if (destinations.length > 0) {
+      container.innerHTML = destinations.map(dest => `
+        <div class="card clickable text-center justify-center pointer animate-fade" style="padding: 0; overflow: hidden; aspect-ratio: 0.8;">
+          <img src="${dest.image_url}" style="width: 100%; height: 60%; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x200?text=Explore'">
+          <div style="padding: 1rem;">
+            <h4 style="margin: 0; font-size: 1.1rem; color: var(--text-heading);">${dest.city}</h4>
+            <p style="font-size: 0.85rem; color: var(--text-body); margin-top: 0.25rem;">Popular Choice</p>
+            <button class="btn btn-primary" style="margin-top: 0.5rem; padding: 0.4rem 1rem; font-size: 0.8rem;">Explore</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  } catch (err) {
+    console.error("Dashboard failed to load:", err);
+    container.innerHTML = `<p style="grid-column: span 5; color: red; text-align: center;">Backend fortress unreachable. Ensure Uvicorn is running!</p>`;
+  }
 };

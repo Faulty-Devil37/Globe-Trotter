@@ -36,10 +36,38 @@ export const LoginView = () => {
 export const initLogin = () => {
   const form = document.querySelector('#login-form');
   if (form) {
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      localStorage.setItem('user', JSON.stringify({ name: 'Admin User', email: 'admin@globe.com' }));
-      window.location.hash = '#/';
+      
+      // 1. Get real values from the inputs
+      const email = form.querySelector('input[type="text"]').value;
+      const password = form.querySelector('input[type="password"]').value;
+
+      try {
+        // 2. Call your FastAPI Backend
+        const response = await fetch('http://127.0.0.1:8000/login/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // 3. Store real user data from your MySQL database 
+          localStorage.setItem('user', JSON.stringify({ 
+            id: data.user_id, 
+            name: data.name, 
+            email: email 
+          }));
+          window.location.hash = '#/';
+        } else {
+          alert("Error: " + (data.detail || "Invalid credentials"));
+        }
+      } catch (err) {
+        console.error("Backend unreachable:", err);
+        alert("The Backend fortress is down! Check your terminal.");
+      }
     });
   }
 };
