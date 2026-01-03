@@ -117,3 +117,23 @@ def get_trip_breakdown(db: Session, trip_id: int):
         "activity_expenses": activity_total, 
         "total_cost": total_cost          
     }
+
+def get_popular_destinations(db: Session):
+    results = db.query(
+        TripStop.city, 
+        func.count(TripStop.city).label('visit_count')
+    ).group_by(TripStop.city)\
+     .order_by(func.count(TripStop.city).desc())\
+     .limit(5)\
+     .all()
+
+    popular_list = []
+    for city, count in results:
+        image_url = f"https://loremflickr.com/800/600/{city},city,view/all"  
+        popular_list.append({
+            "city": city,
+            "visitors": count,
+            "image": image_url 
+        })
+        
+    return popular_list
